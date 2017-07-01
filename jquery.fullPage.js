@@ -108,6 +108,8 @@
 
         var FP = $.fn.fullpage;
 
+
+
         // Creating some defaults, extending them with any options that were provided
         options = $.extend({
             //navigation
@@ -192,13 +194,27 @@
             lazyLoading: true
         }, options);
 
+
         //flag to avoid very fast sliding for landscape sliders
         var slideMoving = false;
 
         var isTouchDevice = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|playbook|silk|BlackBerry|BB10|Windows Phone|Tizen|Bada|webOS|IEMobile|Opera Mini)/);
         var isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0) || (navigator.maxTouchPoints));
         var container = $(this);
-        var windowsHeight = $window.height();
+        
+
+    //Steve Thorson POC vars
+        var mobileResize1 = 0;
+        var mobileResize2 = 0;
+        var fireonce = 0;
+        if(isTouchDevice)  {
+            mobileResize1 = ($window.height()*0.07);
+            mobileResize2 = ($window.height()*0.17);
+        }
+    //End POC vars
+
+
+        var windowsHeight = $window.height() + mobileResize1;
         var isResizing = false;
         var isWindowFocused = true;
         var lastScrolledDestiny;
@@ -243,7 +259,7 @@
         function setAutoScrolling(value, type){
             //removing the transformation
             if(!value){
-                silentScroll(0);
+               // silentScroll(0);
             }
 
             setVariableState('autoScrolling', value, type);
@@ -253,7 +269,7 @@
             if(options.autoScrolling && !options.scrollBar){
                 $htmlBody.css({
                     'overflow' : 'hidden',
-                    'height' : '100%'
+                    'height' : '108%'
                 });
 
                 setRecordHistory(originals.recordHistory, 'internal');
@@ -450,7 +466,7 @@
 
             isResizing = true;
 
-            windowsHeight = $window.height();  //updating global var
+            windowsHeight = $window.height() + mobileResize1;  //updating global var
 
             $(SECTION_SEL).each(function(){
                 var slidesWrap = $(this).find(SLIDES_WRAPPER_SEL);
@@ -546,6 +562,7 @@
         }
 
         function init(){
+
             //if css3 is not supported, it will use jQuery animations
             if(options.css3){
                 options.css3 = support3d();
@@ -566,6 +583,24 @@
                 scrollToAnchor();
             }
             $window.on('load', scrollToAnchor);
+
+
+        // Steve Thorson added the following variables for proof of concept only.
+  
+        if(isTouchDevice) {
+            setAutoScrolling(false);
+            $( window ).resize(function() {
+              setTimeout(function(){
+                if(fireonce == 0){
+                  setAutoScrolling(true);
+                  moveSectionDown();
+                }
+                fireonce++;
+              }, 1);
+            });
+        }
+        // end proof of concept code
+
         }
 
         function bindEvents(){
@@ -651,7 +686,7 @@
             $('html').addClass(ENABLED);
 
             //due to https://github.com/alvarotrigo/fullPage.js/issues/1502
-            windowsHeight = $window.height();
+            windowsHeight = $window.height() + mobileResize2;
 
             container.removeClass(DESTROYED); //in case it was destroyed before initializing it again
 
