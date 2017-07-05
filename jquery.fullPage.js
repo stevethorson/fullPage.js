@@ -197,24 +197,23 @@
 
         //flag to avoid very fast sliding for landscape sliders
         var slideMoving = false;
-
         var isTouchDevice = navigator.userAgent.match(/(iPhone|iPod|iPad|Android|playbook|silk|BlackBerry|BB10|Windows Phone|Tizen|Bada|webOS|IEMobile|Opera Mini)/);
         var isTouch = (('ontouchstart' in window) || (navigator.msMaxTouchPoints > 0) || (navigator.maxTouchPoints));
         var container = $(this);
         
 
+
+
     //Steve Thorson POC vars
-        var mobileResize1 = 0;
-        var mobileResize2 = 0;
+        var mobileResize = 0;
         var fireonce = 0;
         if(isTouchDevice)  {
-            mobileResize1 = ($window.height()*0.07);
-            mobileResize2 = ($window.height()*0.17);
+            mobileResize = 77;
         }
+
     //End POC vars
 
-
-        var windowsHeight = $window.height() + mobileResize1;
+        var windowsHeight = $window.height();
         var isResizing = false;
         var isWindowFocused = true;
         var lastScrolledDestiny;
@@ -466,7 +465,7 @@
 
             isResizing = true;
 
-            windowsHeight = $window.height() + mobileResize1;  //updating global var
+            windowsHeight = $window.height();  //updating global var
 
             $(SECTION_SEL).each(function(){
                 var slidesWrap = $(this).find(SLIDES_WRAPPER_SEL);
@@ -587,6 +586,11 @@
 
         // Steve Thorson added the following variables for proof of concept only.
   
+        //quick hack to target Chrome iOS on iphone 5.
+        if($window.width() == 320 && $window.height() == 492){
+            setAutoScrolling(false);
+        }
+
         if(isTouchDevice) {
             setAutoScrolling(false);
             $( window ).resize(function() {
@@ -599,6 +603,8 @@
               }, 1);
             });
         }
+
+
         // end proof of concept code
 
         }
@@ -686,7 +692,7 @@
             $('html').addClass(ENABLED);
 
             //due to https://github.com/alvarotrigo/fullPage.js/issues/1502
-            windowsHeight = $window.height() + mobileResize2;
+            windowsHeight = $window.height() + mobileResize;
 
             container.removeClass(DESTROYED); //in case it was destroyed before initializing it again
 
